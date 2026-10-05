@@ -105,6 +105,10 @@ void QGLView::init()
 
   this->mouse_drag_active = false;
   this->statusLabel = nullptr;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  this->stereo = Settings::Settings::stereo3dView.value();
+#endif
+  this->stereoEyeSeparation = Settings::Settings::stereo3dEyeSeparation.value();
 
   setMouseTracking(true);
 }
@@ -215,7 +219,24 @@ void QGLView::resizeGL(int w, int h)
 
 void QGLView::paintGL()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  // One eye per call: the left buffer first, then the right one
+  const bool eyes = stereo && format().stereo();
+  if (eyes) {
+    const auto halfSeparation = stereoEyeSeparation / 100.0 * cam.zoomValue() / 2.0;
+    stereoEyeOffset =
+      currentTargetBuffer() == QOpenGLWidget::RightBuffer ? halfSeparation : -halfSeparation;
+  }
+#endif
   GLView::paintGL();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  // Picking uses the camera between the eyes
+  if (eyes) {
+    depthEyeOffset = stereoEyeOffset;
+    stereoEyeOffset = 0.0;
+    setupCamera();
+  }
+#endif
 
   if (statusLabel) {
     auto status = QString("%1 (%2x%3)")
@@ -288,6 +309,8 @@ void QGLView::mouseDoubleClickEvent(QMouseEvent *event)
     setGLContext(oldContext);
   });
 
+  // The depth buffer holds the eye drawn last, so its camera is needed to read the depth
+  stereoEyeOffset = depthEyeOffset;
   setupCamera();
 
   int viewport[4];
@@ -297,6 +320,10 @@ void QGLView::mouseDoubleClickEvent(QMouseEvent *event)
   glGetIntegerv(GL_VIEWPORT, viewport);
   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
   glGetDoublev(GL_PROJECTION_MATRIX, projection);
+
+  // Picking uses the camera between the eyes
+  stereoEyeOffset = 0.0;
+  setupCamera();
 
   const double dpi = this->getDPI();
   const double x = event->pos().x() * dpi;

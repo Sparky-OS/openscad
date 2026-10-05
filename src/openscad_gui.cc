@@ -36,6 +36,7 @@
 #include <QIcon>
 #include <QObject>
 #include <QPalette>
+#include <QSettings>
 #include <QSurfaceFormat>
 #include <QStringList>
 #include <QStyleHints>
@@ -126,6 +127,14 @@ void configureOpenGLContext()
   format.setProfile(QSurfaceFormat::CompatibilityProfile);
   if (format.depthBufferSize() < 24) format.setDepthBufferSize(24);
   if (format.stencilBufferSize() < 8) format.setStencilBufferSize(8);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  // QOpenGLWidget draws for each eye only if the default format asks for stereo buffers, and that
+  // must be known before the window is created, so the preference is read from the settings here.
+  const QSettings settings("OpenSCAD", "OpenSCAD");
+  if (settings.value(QString::fromStdString(Settings::Settings::stereo3dView.key()), false).toBool()) {
+    format.setOption(QSurfaceFormat::StereoBuffers);
+  }
+#endif
   QSurfaceFormat::setDefaultFormat(format);
 #endif
 }
