@@ -229,7 +229,9 @@ void QGLView::resizeGL(int w, int h)
 
 void QGLView::paintGL()
 {
+  stereo3d.beginEye();
   GLView::paintGL();
+  stereo3d.endEye();
 
   if (statusLabel) {
     auto status = QString("%1 (%2x%3)")
@@ -302,6 +304,7 @@ void QGLView::mouseDoubleClickEvent(QMouseEvent *event)
     setGLContext(oldContext);
   });
 
+  stereo3d.beginDepthRead();
   setupCamera();
 
   int viewport[4];
@@ -311,6 +314,7 @@ void QGLView::mouseDoubleClickEvent(QMouseEvent *event)
   glGetIntegerv(GL_VIEWPORT, viewport);
   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
   glGetDoublev(GL_PROJECTION_MATRIX, projection);
+  stereo3d.endDepthRead();
 
   const double dpi = this->getDPI();
   const double x = event->pos().x() * dpi;
