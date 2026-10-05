@@ -3559,6 +3559,8 @@ void MainWindow::setupPreferences()
           QOverload<>::of(&QGLView::update));
   connect(GlobalPreferences::inst(), &Preferences::updateMouseCentricZoom, this->qglview,
           &QGLView::setMouseCentricZoom);
+  connect(GlobalPreferences::inst(), &Preferences::updateStereo3dEyeSeparation, this->qglview,
+          &QGLView::setStereo3dEyeSeparation);
   connect(GlobalPreferences::inst()->MouseConfig, &MouseConfigWidget::updateMouseActions, this,
           &MainWindow::setAllMouseViewActions);
 

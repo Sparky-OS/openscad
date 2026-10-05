@@ -82,6 +82,9 @@ QSurfaceFormat compatibleWidgetFormat()
   format.setProfile(QSurfaceFormat::CompatibilityProfile);
   if (format.depthBufferSize() < 24) format.setDepthBufferSize(24);
   if (format.stencilBufferSize() < 8) format.setStencilBufferSize(8);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  if (Settings::Settings::stereo3dView.value()) format.setOption(QSurfaceFormat::StereoBuffers);
+#endif
   return format;
 }
 
@@ -105,6 +108,10 @@ void QGLView::init()
 
   this->mouse_drag_active = false;
   this->statusLabel = nullptr;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  this->stereo = Settings::Settings::stereo3dView.value();
+#endif
+  this->stereoEyeSeparation = Settings::Settings::stereo3dEyeSeparation.value();
 
   setMouseTracking(true);
 }
@@ -215,7 +222,23 @@ void QGLView::resizeGL(int w, int h)
 
 void QGLView::paintGL()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  // One eye per call: the left buffer first, then the right one
+  const bool eyes = stereo && format().stereo();
+  if (eyes) {
+    const auto halfSeparation = stereoEyeSeparation / 100.0 * cam.zoomValue() / 2.0;
+    stereoEyeOffset = currentTargetBuffer() == QOpenGLWidget::RightBuffer ? halfSeparation
+                                                                           : -halfSeparation;
+  }
+#endif
   GLView::paintGL();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  // Picking and centering use the camera between the eyes
+  if (eyes) {
+    stereoEyeOffset = 0.0;
+    setupCamera();
+  }
+#endif
 
   if (statusLabel) {
     auto status = QString("%1 (%2x%3)")

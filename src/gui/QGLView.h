@@ -59,6 +59,11 @@ public slots:
   void ZoomIn();
   void ZoomOut();
   void setMouseCentricZoom(bool var) { this->mouseCentricZoom = var; }
+  void setStereo3dEyeSeparation(double percent)
+  {
+    this->stereoEyeSeparation = percent;
+    update();
+  }
   void setMouseActions(int mouseAction, std::array<float, MouseConfig::ACTION_DIMENSION> var)
   {
     // Load an array defining the behaviour for a single mouse action.
@@ -83,6 +88,8 @@ private:
   bool mouse_drag_active;
   bool mouse_drag_moved = true;
   bool mouseCentricZoom = true;
+  bool stereo = false;            // draws the view for each eye, when asked in the preferences
+  double stereoEyeSeparation = 0;  // in percent of the distance to the point looked at
   // Information held for each mouse action is a 3x2 rotation matrix, a 3x2 translation matrix, and a
   // zoom 2-vector.
   float mouseActions[MouseConfig::MouseAction::NUM_MOUSE_ACTIONS * MouseConfig::ACTION_DIMENSION];
