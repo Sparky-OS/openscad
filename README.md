@@ -1,3 +1,28 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/sparky-stereo-os/sparkyos-swirl-light-128.png">
+  <img src=".github/sparky-stereo-os/sparkyos-swirl-dark-128.png" alt="SparkyOS" width="128" height="128">
+</picture>
+
+## Sparky Stereo OS
+
+This is the stereo version of OpenSCAD by Sparky Stereo OS, forked from [openscad/openscad](https://github.com/openscad/openscad).
+Its 3D view can draw the model once for each eye, one world and two cameras, into an OpenGL quad-buffer stereo window (a stereo setting in Preferences).
+Without the setting nothing changes; on Sparky Stereo OS the desktop shows the stereo window on any 3D display.
+
+Where it comes from:
+
+- [OpenSCAD](https://openscad.org/) was created by Clifford Wolf and Marius Kintel (the copyright in `src/openscad.cc`) and is developed by its contributors.
+- [Debian](https://www.debian.org/) is the base of the system.
+- [SparkyLinux](https://sparkylinux.org/), by Paweł "pavroo" Pijanowski, builds on Debian.
+- [Sparky Stereo OS](https://github.com/Sparky-OS/sparky-stereo-os) is the stereo 3D edition of SparkyLinux: SparkyOS, powered by Debian.
+
+The `stereo3d` branch holds this work on OpenSCAD's master of 2026-10-04 (`c0ac828`).
+The licence is unchanged; see [COPYING](COPYING).
+
+Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski).
+
+---
+
 [![GitHub (master)](https://img.shields.io/github/checks-status/openscad/openscad/master.svg?logo=github&label=build&logoColor=black&colorA=f9d72c&style=plastic)](https://github.com/openscad/openscad/actions)
 [![CircleCI (master)](https://img.shields.io/circleci/project/github/openscad/openscad/master.svg?logo=circleci&logoColor=black&colorA=f9d72c&style=plastic)](https://circleci.com/gh/openscad/openscad/tree/master)
 [![Coverity Scan](https://img.shields.io/coverity/scan/2510.svg?colorA=f9d72c&logoColor=black&style=plastic)](https://scan.coverity.com/projects/2510)
