@@ -45,6 +45,8 @@ public:
 #ifdef ENABLE_OPENCSG
   bool hasOpenCSGSupport() { return this->is_opencsg_capable; }
 #endif
+  // The surface format the 3D view asks for
+  static QSurfaceFormat compatibleWidgetFormat();
   // Properties
   bool orthoMode() const { return (this->cam.projection == Camera::ProjectionType::ORTHOGONAL); }
   void setOrthoMode(bool enabled);
@@ -134,3 +136,4 @@ signals:
 class QOpenGLContext;
 QOpenGLContext *getGLContext();
 void setGLContext(QOpenGLContext *);
+QSurfaceFormat createdContextFormat(const QSurfaceFormat& format);
