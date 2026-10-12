@@ -69,6 +69,7 @@
 #include "core/Settings.h"
 #include "geometry/GeometryCache.h"
 #include "gui/AutoUpdater.h"
+#include "gui/QGLView.h"
 #include "utils/printutils.h"
 #ifdef ENABLE_CGAL
 #include "geometry/cgal/CGALCache.h"
@@ -793,6 +794,25 @@ void Preferences::on_doubleSpinBoxStereo3dEyeSeparation_valueChanged(double val)
   Settings::Settings::stereo3dEyeSeparation.setValue(val);
   writeSettings();
   emit updateStereo3dEyeSeparation(val);
+}
+
+// Grays out the stereo 3D options when the 3D view cannot draw in stereo. The stored setting stays
+// as it is.
+void Preferences::updateStereo3dOptions()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  if (QGLView::hasStereoBuffers()) return;
+  const QString reason =
+    _("OpenGL on this system has no stereo buffers, which the stereo 3D view needs.");
+#else
+  const QString reason = _("The stereo 3D view needs OpenSCAD built with Qt 6.5 or later.");
+#endif
+  this->checkBoxStereo3dView->setEnabled(false);
+  this->labelStereo3dEyeSeparation->setEnabled(false);
+  this->doubleSpinBoxStereo3dEyeSeparation->setEnabled(false);
+  this->checkBoxStereo3dView->setToolTip(reason);
+  this->labelStereo3dEyeSeparation->setToolTip(reason);
+  this->doubleSpinBoxStereo3dEyeSeparation->setToolTip(reason);
 }
 
 void Preferences::on_spinBoxIndentationWidth_valueChanged(int val)
@@ -1865,6 +1885,7 @@ void Preferences::showEvent(QShowEvent *e)
   if (!this->printPageSetupDone) {
     setup3DPrintPage();
   }
+  updateStereo3dOptions();
   QMainWindow::showEvent(e);
   hidePasswords();
 }

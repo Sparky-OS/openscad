@@ -62,6 +62,7 @@
 #include "gui/OpenCSGWarningDialog.h"
 
 #include <cstdio>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -84,6 +85,9 @@ QSurfaceFormat compatibleWidgetFormat()
   if (format.stencilBufferSize() < 8) format.setStencilBufferSize(8);
   return format;
 }
+
+// Whether the 3D view gets stereo buffers, once it is known
+std::optional<bool> stereoBuffers;
 
 }  // namespace
 
@@ -152,9 +156,24 @@ void QGLView::initializeGL()
 
   GLView::initializeGL();
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+  // A view that asked for stereo buffers knows from its own format whether it got them
+  if (stereo) stereoBuffers = format().stereo();
+#endif
+
   this->selector = std::make_unique<MouseSelector>(this);
 
   emit initialized();
+}
+
+bool QGLView::hasStereoBuffers()
+{
+  if (!stereoBuffers) {
+    auto format = compatibleWidgetFormat();
+    format.setOption(QSurfaceFormat::StereoBuffers);
+    stereoBuffers = stereoBuffersAvailable(format);
+  }
+  return *stereoBuffers;
 }
 
 std::string QGLView::getRendererInfo() const

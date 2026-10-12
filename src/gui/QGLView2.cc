@@ -24,7 +24,8 @@
  */
 
 /*
- * This file defines two helper functions for saving and restoring OpenGL contexts.
+ * This file defines two helper functions for saving and restoring OpenGL contexts,
+ * and one that tells whether a context gets stereo buffers.
  * They are in a separate file (rather than in the more obvious QGLView.cc) because
  * <QOpenGLContext> is incompatible with GLEW and produces compilation warning messages.
  * Putting them in a separate file in helper functions allows the main file to need
@@ -33,6 +34,7 @@
  * See also the discussion at QGLView::mouseDoubleClickEvent().
  */
 #include <QOpenGLContext>
+#include <QSurfaceFormat>
 
 QOpenGLContext *getGLContext()
 {
@@ -50,4 +52,18 @@ void setGLContext(QOpenGLContext *ctx)
   if (ctx) {
     ctx->makeCurrent(ctx->surface());
   }
+}
+
+bool stereoBuffersAvailable(const QSurfaceFormat& format)
+{
+  /*
+   * Qt picks the framebuffer configuration when it creates the context, and the
+   * context's format says whether it has stereo buffers.  QOpenGLWidget draws each
+   * eye only when its own context's format says so, so this is the same answer the
+   * 3D view gets.  No surface is needed, so no window is shown, and the current
+   * context stays current.
+   */
+  QOpenGLContext context;
+  context.setFormat(format);
+  return context.create() && context.format().stereo();
 }
