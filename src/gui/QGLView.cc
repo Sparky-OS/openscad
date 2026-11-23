@@ -85,7 +85,9 @@ QSurfaceFormat QGLView::compatibleWidgetFormat()
 
 QGLView::QGLView(QWidget *parent) : QOpenGLWidget(parent)
 {
-  setFormat(compatibleWidgetFormat());
+  auto format = compatibleWidgetFormat();
+  Stereo3dView::requestStereoBuffers(format);
+  setFormat(format);
   init();
 }
 

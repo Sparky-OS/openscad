@@ -1382,6 +1382,7 @@ set(GUI_SOURCES
   src/gui/ScintillaEditor.cc
   src/gui/SettingsWriter.cc
   src/gui/Stereo3dView.cc
+  src/gui/StereoDepthLimits.cc
   src/gui/TabManager.cc
   src/gui/UIUtils.cc
   src/gui/WindowManager.cc
@@ -1460,6 +1461,7 @@ set(GUI_HEADERS
     src/gui/ScintillaEditor.h
     src/gui/SettingsWriter.h
     src/gui/Stereo3dView.h
+    src/gui/StereoDepthLimits.h
     src/gui/TabManager.h
     src/gui/UIUtils.h
     src/gui/ViewportControl.h
@@ -1692,6 +1694,11 @@ if (USE_QT6)
       Qt6::Core Qt6::Core5Compat Qt6::Widgets Qt6::Multimedia Qt6::OpenGL Qt6::OpenGLWidgets Qt6::Concurrent Qt6::Network Qt6::Svg
       ${QT6QSCINTILLA_LIBRARY} ${Qt6DBus_LIBRARIES} ${Qt6Gamepad_LIBRARIES}
     )
+    # The stereo 3D view: the window system's handles (Qt's native interface) and the person's
+    # depth limits (libstereo-declare)
+    find_package(Qt6 COMPONENTS GuiPrivate REQUIRED QUIET)
+    pkg_check_modules(STEREO_DECLARE REQUIRED IMPORTED_TARGET stereo-declare>=1.11)
+    target_link_libraries(OpenSCADLibInternal PUBLIC Qt6::GuiPrivate PkgConfig::STEREO_DECLARE)
   endif()
   if(ENABLE_GUI_TESTS)
     target_link_libraries(OpenSCADLibInternal PUBLIC Qt6::Test)

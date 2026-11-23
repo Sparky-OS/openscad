@@ -45,6 +45,8 @@ public:
   void initializeGL();
   void resizeGL(int w, int h);
   virtual void paintGL();
+  // Called by paintGL() once the scene is drawn, before the 2D items drawn over it
+  virtual void sceneDrawn() {}
 
   void setCamera(const Camera& cam);
   void setupCamera();

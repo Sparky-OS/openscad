@@ -114,6 +114,7 @@ private:
   void resizeGL(int w, int h) override;
 
   void paintGL() override;
+  void sceneDrawn() override { stereo3d.sceneDrawn(); }
   void normalizeAngle(GLdouble& angle);
 
 #ifdef ENABLE_OPENCSG

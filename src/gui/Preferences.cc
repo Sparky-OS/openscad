@@ -46,6 +46,7 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
 #include <QObject>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
@@ -792,27 +793,18 @@ void Preferences::on_checkBoxStereo3dView_toggled(bool val)
 {
   Settings::Settings::stereo3dView.setValue(val);
   writeSettings();
+  // A desktop without stereo buffers keeps the view in 2D: the person who asks for 3D is told why
+  if (val && !Stereo3dView::isAvailable()) {
+    QMessageBox::information(this, QStringLiteral("OpenSCAD"), Stereo3dView::unavailableReason());
+  }
 }
 
-void Preferences::on_doubleSpinBoxStereo3dEyeSeparation_valueChanged(double val)
+void Preferences::on_pushButtonStereo3dDisplaySettings_clicked()
 {
-  Settings::Settings::stereo3dEyeSeparation.setValue(val);
-  writeSettings();
-  emit requestRedraw();
-}
-
-// Grays out the stereo 3D options when the 3D view cannot draw in stereo. The stored setting stays
-// as it is.
-void Preferences::updateStereo3dOptions()
-{
-  if (Stereo3dView::isAvailable()) return;
-  const QString reason = Stereo3dView::unavailableReason();
-  this->checkBoxStereo3dView->setEnabled(false);
-  this->labelStereo3dEyeSeparation->setEnabled(false);
-  this->doubleSpinBoxStereo3dEyeSeparation->setEnabled(false);
-  this->checkBoxStereo3dView->setToolTip(reason);
-  this->labelStereo3dEyeSeparation->setToolTip(reason);
-  this->doubleSpinBoxStereo3dEyeSeparation->setToolTip(reason);
+  // The depth limits, the 3D modes and every output format are the desktop's Display Settings
+  if (QProcess::startDetached(QStringLiteral("systemsettings"), {QStringLiteral("kcm_kscreen")})) return;
+  if (QProcess::startDetached(QStringLiteral("kcmshell6"), {QStringLiteral("kcm_kscreen")})) return;
+  QMessageBox::warning(this, QStringLiteral("OpenSCAD"), _("Display Settings could not be opened."));
 }
 
 void Preferences::on_spinBoxIndentationWidth_valueChanged(int val)
@@ -1885,7 +1877,6 @@ void Preferences::showEvent(QShowEvent *e)
   if (!this->printPageSetupDone) {
     setup3DPrintPage();
   }
-  updateStereo3dOptions();
   QMainWindow::showEvent(e);
   hidePasswords();
 }
@@ -2060,8 +2051,6 @@ void Preferences::updateGUI()
   initUpdateCheckBox(this->checkBoxShowWarningsIn3dView, Settings::Settings::showWarningsIn3dView);
   initUpdateCheckBox(this->checkBoxMouseCentricZoom, Settings::Settings::mouseCentricZoom);
   initUpdateCheckBox(this->checkBoxStereo3dView, Settings::Settings::stereo3dView);
-  initUpdateDoubleSpinBox(this->doubleSpinBoxStereo3dEyeSeparation,
-                          Settings::Settings::stereo3dEyeSeparation);
   initUpdateCheckBox(this->checkBoxEnableLineNumbers, Settings::Settings::enableLineNumbers);
 
   /* Next Line disables the Indent Spin-Box,for 'Same' and 'Indented' LineWrapStyle selection from

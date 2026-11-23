@@ -109,35 +109,26 @@
         </item>
         <item>
          <widget class="QCheckBox" name="checkBoxStereo3dView">
-          <property name="toolTip">
-           <string>Draws the 3D view once for each eye, for a stereo capable display. Takes effect after a restart.</string>
-          </property>
           <property name="text">
-           <string>stereo 3D view (after restart)</string>
+           <string>Enable 3D (applies to new windows)</string>
           </property>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayoutStereo3dEyeSeparation">
+         <layout class="QHBoxLayout" name="horizontalLayoutStereo3dDisplaySettings">
           <item>
-           <widget class="QLabel" name="labelStereo3dEyeSeparation">
+           <widget class="QPushButton" name="pushButtonStereo3dDisplaySettings">
             <property name="text">
-             <string>eye separation</string>
+             <string>3D display settings...</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxStereo3dEyeSeparation">
-            <property name="toolTip">
-             <string>Distance between the eyes, as a percentage of the distance to the point looked at</string>
+           <spacer name="horizontalSpacerStereo3dDisplaySettings">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-            <property name="suffix">
-             <string> %</string>
-            </property>
-            <property name="decimals">
-             <number>1</number>
-            </property>
-           </widget>
+           </spacer>
           </item>
          </layout>
         </item>

@@ -203,17 +203,25 @@ void GLView::setupCamera()
   case Camera::ProjectionType::ORTHOGONAL: {
     auto height = dist * tan_degrees(cam.fov / 2);
     glOrtho(-height * aspectratio, height * aspectratio, -height, height, -100 * dist, +100 * dist);
+    if (stereoEyeOffset != 0.0) {
+      // Parallel views of one world: a shear about the point looked at, x' = x + s * (d - dist),
+      // d being the distance in front of the eye, so points at the distance of the point looked at
+      // stay where they are and the two eyes differ by 2 * s * (d - dist)
+      const GLdouble s = stereoEyeOffset / dist;
+      const GLdouble shear[16] = {1, 0, 0, 0, 0, 1, 0, 0, -s, 0, 1, 0, -s * dist, 0, 0, 1};
+      glMultMatrixd(shear);
+    }
     break;
   }
   }
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   // Perspective: the eye moves sideways and keeps looking straight ahead.
-  // Orthographic: the eye turns around the point looked at.
-  const auto centerX = cam.projection == Camera::ProjectionType::PERSPECTIVE ? stereoEyeOffset : 0.0;
-  local_gluLookAt(stereoEyeOffset, -dist, 0.0,  // eye
-                  centerX, 0.0, 0.0,            // center
-                  0.0, 0.0, 1.0);               // up
+  // Orthographic: the eye stays, its projection is sheared (above).
+  const auto eyeX = cam.projection == Camera::ProjectionType::PERSPECTIVE ? stereoEyeOffset : 0.0;
+  local_gluLookAt(eyeX, -dist, 0.0,  // eye
+                  eyeX, 0.0, 0.0,    // center
+                  0.0, 0.0, 1.0);    // up
 
   glRotated(cam.object_rot.x(), 1.0, 0.0, 0.0);
   glRotated(cam.object_rot.y(), 0.0, 1.0, 0.0);
@@ -292,6 +300,7 @@ void GLView::paintGL()
   for (const SelectedObject& obj : this->shown_obj) {
     showObject(obj, eyedir);
   }
+  sceneDrawn();
   glDisable(GL_LIGHTING);
   if (showaxes) GLView::showSmallaxes(axescolor);
 

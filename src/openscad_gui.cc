@@ -76,7 +76,6 @@
 #include "gui/OpenSCADApp.h"
 #include "gui/Preferences.h"
 #include "gui/QSettingsCached.h"
-#include "gui/Stereo3dView.h"
 #include "openscad.h"
 #include "platform/CocoaUtils.h"
 #include "utils/printutils.h"
@@ -137,7 +136,6 @@ void configureOpenGLContext()
   format.setProfile(QSurfaceFormat::CompatibilityProfile);
   if (format.depthBufferSize() < 24) format.setDepthBufferSize(24);
   if (format.stencilBufferSize() < 8) format.setStencilBufferSize(8);
-  Stereo3dView::requestStereoBuffers(format);
   QSurfaceFormat::setDefaultFormat(format);
 #endif
 }
