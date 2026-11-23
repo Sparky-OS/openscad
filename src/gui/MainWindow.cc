@@ -629,6 +629,13 @@ MainWindow::~MainWindow()
     dock->disconnect(this);
     dock->removeEventFilter(this);
   }
+  // The window filters its own events and the find panel's too. rubberBandManager
+  // is a child QObject of this window, so its ~QObject, which runs after its own
+  // QRubberBand member is destroyed, sends ChildRemoved here, and eventFilter()
+  // would ask that destroyed rubber band whether it is visible; the find panel
+  // is deleted later still, by ~QWidget.
+  removeEventFilter(this);
+  find_panel->removeEventFilter(this);
 
   delete this->geometryWorker;
 }
